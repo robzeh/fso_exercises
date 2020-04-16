@@ -1,14 +1,8 @@
 import React from "react";
 
-const Person = ({ person }) => {
-  return (
-    <div>
-      {person.name} - {person.number}
-    </div>
-  );
+const Persons = ({ persons }) => {
+  return persons.map((person) => <div key={person.id}>{person.name}</div>);
 };
-
-const Persons = ({ persons }) =>
-  persons.map((person) => <Person key={person.id} person={person} />);
+// persons.map((person) => <Person key={person.id} person={person} />);
 
 export default Persons;
