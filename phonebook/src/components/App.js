@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 
 import Persons from "./Persons";
 import Filter from "./Filter";
 import PersonForm from "./PersonForm";
 import Results from "./Results";
+
+import personService from "../services/people";
 
 const App = () => {
   const [persons, setPersons] = useState([]);
@@ -12,14 +13,11 @@ const App = () => {
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
 
-  const hook = () => {
-    axios.get("http://localhost:3001/persons").then((response) => {
-      console.log("fulfilled");
-      setPersons(response.data);
+  useEffect(() => {
+    personService.getAll().then((initialPeople) => {
+      setPersons(initialPeople);
     });
-  };
-
-  useEffect(hook, []);
+  }, []);
 
   const addPerson = (event) => {
     event.preventDefault();
@@ -33,9 +31,11 @@ const App = () => {
         id: persons.length + 1,
       };
 
-      setPersons(persons.concat(person));
-      setNewName("");
-      setNewNumber("");
+      personService.create(person).then((returnedPerson) => {
+        setPersons(persons.concat(returnedPerson));
+        setNewName("");
+        setNewNumber("");
+      });
     } else {
       window.alert(`${newName} is already in`);
     }
@@ -44,27 +44,26 @@ const App = () => {
   const handleNewPerson = (event) => setNewName(event.target.value);
   const handleNewNumber = (event) => setNewNumber(event.target.value);
   const handleNewFilter = (event) => setNewFilter(event.target.value);
+  const handleDeletePerson = (id) => {
+    const personToDelete = persons.find((person) => person.id === id);
 
-  // const peopleToShow =
-  //   filter === ""
-  //     ? persons
-  //     : persons.filter((person) =>
-  //         person.name.toLowerCase().includes(filter.toLowerCase())
-  //       );
+    if (
+      window.confirm(`Are you sure you want to delete ${personToDelete.name}?`)
+    ) {
+      personService.deletePerson(id).then(() => {
+        setPersons(persons.filter((person) => person.id !== id));
+      });
+    }
+  };
 
   const peopleToShow = () => {
-    // let result = "";
-    // if (persons.length > 0) {
-    // let filterPersons = persons.filter((person) =>
-    //   person.name.toLowerCase().includes(filter.toLowerCase())
-    // );
-    // }
-
     let filterPersons = persons.filter((person) =>
       person.name.toLowerCase().includes(filter.toLowerCase())
     );
 
-    const result = <Persons persons={filterPersons} />;
+    const result = (
+      <Persons persons={filterPersons} handleClick={handleDeletePerson} />
+    );
 
     return result;
   };
