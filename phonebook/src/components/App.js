@@ -4,6 +4,7 @@ import Persons from "./Persons";
 import Filter from "./Filter";
 import PersonForm from "./PersonForm";
 import Results from "./Results";
+import Notification from "./Notification";
 
 import personService from "../services/people";
 
@@ -12,6 +13,7 @@ const App = () => {
   const [filter, setNewFilter] = useState("");
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
     personService.getAll().then((initialPeople) => {
@@ -46,6 +48,8 @@ const App = () => {
         setNewName("");
         setNewNumber("");
       });
+
+      showNotification(person, false);
     } else {
       if (
         window.confirm(
@@ -69,6 +73,7 @@ const App = () => {
       personService.deletePerson(id).then(() => {
         setPersons(persons.filter((person) => person.id !== id));
       });
+      showNotification(personToDelete.name, false);
     }
   };
 
@@ -84,8 +89,23 @@ const App = () => {
     return result;
   };
 
+  const showNotification = (message, isError) => {
+    if (isError) {
+      setErrorMessage(`${message.name} was already added`);
+      setTimeout(() => {
+        setErrorMessage(null);
+      }, 5000);
+    } else {
+      setErrorMessage(`${message.name} was succesfully added`);
+      setTimeout(() => {
+        setErrorMessage(null);
+      }, 5000);
+    }
+  };
+
   return (
     <div>
+      <Notification message={errorMessage} />
       <h2>Phonebook</h2>
       <Filter nameSearch={filter} handleNameSearch={handleNewFilter} />
       <PersonForm
