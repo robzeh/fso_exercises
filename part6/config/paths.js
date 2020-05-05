@@ -55,7 +55,7 @@ module.exports = {
   appBuild: resolveApp("build"),
   appPublic: resolveApp("public"),
   appHtml: resolveApp("public/index.html"),
-  appIndexJs: resolveModule(resolveApp, "src/App"),
+  appIndexJs: resolveModule(resolveApp, "src/Index"),
   appPackageJson: resolveApp("package.json"),
   appSrc: resolveApp("src"),
   appTsConfig: resolveApp("tsconfig.json"),
