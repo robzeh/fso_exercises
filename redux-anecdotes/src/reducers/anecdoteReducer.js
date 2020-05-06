@@ -24,11 +24,24 @@ export const vote = (id) => {
   };
 };
 
+export const addAnecdote = (content) => {
+  return {
+    type: "NEW_ANECDOTE",
+    data: {
+      content,
+      id: getId(),
+      votes: 0,
+    },
+  };
+};
+
 const initialState = anecdotesAtStart.map(asObject);
 
 const reducer = (state = initialState, action) => {
   console.log("action", action);
   switch (action.type) {
+    case "NEW_ANECDOTE":
+      return [...state, action.data];
     case "VOTE":
       const id = action.data.id;
       const anecdoteToChange = state.find((a) => a.id === id);

@@ -20,13 +20,15 @@ const Anecdotes = () => {
 
   return (
     <div>
-      {anecdotes.map((a) => (
-        <Anecdote
-          key={a.id}
-          anecdote={a}
-          handleClick={() => dispatch(vote(a.id))}
-        />
-      ))}
+      {anecdotes
+        .sort((a, b) => b.votes - a.votes)
+        .map((a) => (
+          <Anecdote
+            key={a.id}
+            anecdote={a}
+            handleClick={() => dispatch(vote(a.id))}
+          />
+        ))}
     </div>
   );
 };
