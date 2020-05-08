@@ -17,12 +17,12 @@ const Anecdote = ({ anecdote, handleClick }) => {
 
 const Anecdotes = () => {
   const dispatch = useDispatch();
-  const anecdotes = useSelector((state) => state.anecdotes);
-  const filter = useSelector((state) => state.filter);
 
-  const filteredAnecdotes = filter
-    ? anecdotes.filter((a) => a.content.toLowerCase().includes(filter))
-    : anecdotes;
+  const anecdotes = useSelector(({ anecdotes, filter }) => {
+    return filter
+      ? anecdotes.filter((a) => a.content.toLowerCase().includes(filter))
+      : anecdotes;
+  });
 
   const addVote = (anecdote) => {
     dispatch(vote(anecdote.id));
@@ -34,11 +34,13 @@ const Anecdotes = () => {
 
   return (
     <div>
-      {filteredAnecdotes
-        .sort((a, b) => b.votes - a.votes)
-        .map((a) => (
-          <Anecdote key={a.id} anecdote={a} handleClick={() => addVote(a)} />
-        ))}
+      {anecdotes.map((anec) => (
+        <Anecdote
+          key={anec.id}
+          anecdote={anec}
+          handleClick={() => addVote(anec)}
+        />
+      ))}
     </div>
   );
 };
