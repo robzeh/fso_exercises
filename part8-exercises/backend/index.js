@@ -27,8 +27,9 @@ let authors = [
 ];
 
 /*
- * Saattaisi olla järkevämpää assosioida kirja ja sen tekijä tallettamalla kirjan yhteyteen tekijän nimen sijaan tekijän id
- * Yksinkertaisuuden vuoksi tallennamme kuitenkin kirjan yhteyteen tekijän nimen
+ * It would be more sensible to assosiate book and the author by saving
+ * the author id instead of the name to the book.
+ * For simplicity we however save the author name.
  */
 
 let books = [
@@ -75,7 +76,7 @@ let books = [
     genres: ['classic', 'crime'],
   },
   {
-    title: 'The Demon ',
+    title: 'The Demon',
     published: 1872,
     author: 'Fyodor Dostoevsky',
     id: 'afa5de04-344d-11e9-a414-719c6709cf3e',
@@ -86,15 +87,23 @@ let books = [
 const typeDefs = gql`
   type Book {
     title: String!
-    author: String!
+    author: Author!
     published: Int!
     genres: [String!]!
+  }
+
+  type Author {
+    name: String!
+    id: ID!
+    born: Int
+    bookCount: Int
   }
 
   type Query {
     bookCount: Int!
     authorCount: Int!
-    allBooks: [Book!]!
+    allBooks(author: String): [Book!]!
+    allAuthors: [Author!]!
   }
 `;
 
@@ -102,7 +111,29 @@ const resolvers = {
   Query: {
     bookCount: () => books.length,
     authorCount: () => authors.length,
-    allBooks: () => books,
+    allBooks: (root, args) => {
+      if (!args.author) {
+        return books;
+      }
+
+      console.log(args);
+
+      const byAuthor = (a) => a.name === args.author;
+      return books.filter(byAuthor);
+    },
+    allAuthors: () =>
+      authors.map((author) => ({
+        name: author.name,
+        bookCount: books.filter((book) => book.author === author.name).length,
+      })),
+  },
+  Book: {
+    author: (root) => {
+      return {
+        name: root.author,
+        id: root.id,
+      };
+    },
   },
 };
 
